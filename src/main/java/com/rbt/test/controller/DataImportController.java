@@ -11,25 +11,25 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/v1/dataImport")
+@RequestMapping("/v1/data-import")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "rbt")
 public class DataImportController {
     private final DataImportService dataImportService;
 
-    @PostMapping(value = "/importProfiles/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/profiles/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<ImportResponse> importProfiles(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(dataImportService.importProfiles(file));
     }
 
-    @PostMapping(value = "/importTotalNumberOfDays/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/total-number-of-days/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<ImportResponse> importTotalNumberOfDays(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(dataImportService.importTotalNumberOfDays(file));
     }
 
-    @PostMapping(value = "/importUsedDays/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/used-days/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('write')")
     public ResponseEntity<ImportResponse> importUsedDays(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(dataImportService.importUsedDays(file));
