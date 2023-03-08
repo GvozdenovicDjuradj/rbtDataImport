@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.util.Collections.emptyList;
 
@@ -38,6 +39,15 @@ public class DataImportService {
 
     public ImportResponse importProfiles(MultipartFile file) {
         try {
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            reader.readLine();
+            String line = reader.readLine();
+            var array = line.split(",");
+            if (array.length != 2 || !Objects.equals(array[0], "Employee Email") || !Objects.equals(array[1], "Employee Password")) {
+                throw new RbtException(400, "Invalid csv format");
+            }
+
             var employees = csvParser.parse(file, this::parseEmployee, 2);
             for (EmployeeEntity employee : employees) {
                 if (!employeeRepository.existsByEmail(employee.getEmail())) {
@@ -57,12 +67,13 @@ public class DataImportService {
     public ImportResponse importTotalNumberOfDays(MultipartFile file) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            var yearHeader = reader.readLine().split(",");
             String line = reader.readLine();
             var array = line.split(",");
-            if (array.length != 2) {
+            if (yearHeader.length != 2 || array.length != 2 || !Objects.equals(array[0], "Employee") || !Objects.equals(array[1], "Total vacation days")) {
                 throw new RbtException(400, "Invalid csv format");
             }
-            var year = Integer.parseInt(array[1]);
+            var year = Integer.parseInt(yearHeader[1]);
 
             var daysPerYear = csvParser.parse(file, (s) -> parseDaysPerYear(s, year), 2);
             for (DaysPerYearEntity day : daysPerYear) {
@@ -89,6 +100,14 @@ public class DataImportService {
 
     public ImportResponse importUsedDays(MultipartFile file) {
         try {
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+            String line = reader.readLine();
+            var array = line.split(",");
+            if (array.length != 3 || !Objects.equals(array[0], "Employee") || !Objects.equals(array[1], "Vacation start date") || !Objects.equals(array[2], "Vacation end date")) {
+                throw new RbtException(400, "Invalid csv format");
+            }
+
             var usedDays = csvParser.parse(file, (s) -> {
                 try {
                     return parseUsedDays(s);
